@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="list_verified">
+        <item>Sudah Akad Kredit</item>
+        <item>Belum Akad Kredit</item>
+    </string-array>
+</resources>

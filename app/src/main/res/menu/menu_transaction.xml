@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_mutation"
+        android:title="History"
+        android:icon="@drawable/ic_mutation"/>
+    <item
+        android:id="@+id/menu_tagihan"
+        android:title="Tagihan"
+        android:icon="@drawable/ic_tagihan"/>
+</menu>
