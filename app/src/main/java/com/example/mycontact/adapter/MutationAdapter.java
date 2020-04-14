@@ -4,26 +4,23 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mycontact.R;
-import com.example.mycontact.model.Cicilan;
-import com.example.mycontact.model.ListCicilan;
-import com.example.mycontact.model.Mutasi;
+import com.example.mycontact.model.MutationData;
 
 import java.util.List;
 
 public class MutationAdapter extends RecyclerView.Adapter<MutationAdapter.ViewHolder> {
 
-    private List<Mutasi> listMutasi;
+    private List<MutationData> listMutationData;
     private Context context;
 
-    public MutationAdapter(List<Mutasi> listMutasi, Context context) {
-        this.listMutasi = listMutasi;
+    public MutationAdapter(List<MutationData> listMutationData, Context context) {
+        this.listMutationData = listMutationData;
         this.context = context;
     }
 
@@ -37,12 +34,12 @@ public class MutationAdapter extends RecyclerView.Adapter<MutationAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.bind(listMutasi.get(position));
+        holder.bind(listMutationData.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return listMutasi.size();
+        return listMutationData.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -59,11 +56,11 @@ public class MutationAdapter extends RecyclerView.Adapter<MutationAdapter.ViewHo
 
         }
 
-        void bind(Mutasi mutasi) {
-            tvName.setText(mutasi.getNama());
-            tvType.setText(mutasi.getType());
-            tvCicilan.setText(mutasi.getCicilan());
-            tvTransDate.setText(mutasi.getTransDate());
+        void bind(MutationData mutationData) {
+            tvName.setText(mutationData.getNama());
+            tvType.setText(mutationData.getType());
+            tvCicilan.setText(mutationData.getCicilan());
+            tvTransDate.setText(mutationData.getTransDate());
         }
     }
 }

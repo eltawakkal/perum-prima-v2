@@ -48,13 +48,11 @@ public class FragTagihan extends Fragment {
 
         houseId = getArguments().getString(BuyerActivity.HOUSE_ID_KEY);
 
-        Toast.makeText(getContext(), "id:  " + houseId, Toast.LENGTH_SHORT).show();
-
         apiEndPoint = ApiClient.getRetrofit().create(ApiEndPoint.class);
 
         recTagihan = view.findViewById(R.id.rec_tagihan);
 
-//        getTagihanFromServer();
+        getTagihanFromServer();
     }
 
     void getTagihanFromServer() {

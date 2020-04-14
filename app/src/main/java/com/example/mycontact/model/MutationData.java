@@ -2,7 +2,7 @@ package com.example.mycontact.model;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Mutasi {
+public class MutationData {
 
     private String nama;
     private String cicilan;
@@ -10,10 +10,10 @@ public class Mutasi {
     @SerializedName("trans_date")
     private String transDate;
 
-    public Mutasi() {
+    public MutationData() {
     }
 
-    public Mutasi(String nama, String cicilan, String type, String transDate) {
+    public MutationData(String nama, String cicilan, String type, String transDate) {
         this.nama = nama;
         this.cicilan = cicilan;
         this.type = type;

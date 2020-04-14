@@ -3,7 +3,8 @@ package com.example.mycontact.network;
 import com.example.mycontact.model.Buyer;
 import com.example.mycontact.model.Cicilan;
 import com.example.mycontact.model.House;
-import com.example.mycontact.model.Mutasi;
+import com.example.mycontact.model.Mutation;
+import com.example.mycontact.model.MutationData;
 import com.example.mycontact.model.Pt;
 import com.example.mycontact.model.Tagihan;
 import com.example.mycontact.model.Transaction;
@@ -103,7 +104,7 @@ public interface ApiEndPoint {
 
     @FormUrlEncoded
     @POST("get-cicilan.php")
-    Call<List<Cicilan>> getCicilan(
+    Call<Cicilan> getCicilan(
             @Field("buyer_id") String buyerId,
             @Field("house_id") String houseId,
             @Field("unit") String unit
@@ -122,7 +123,7 @@ public interface ApiEndPoint {
 
     @FormUrlEncoded
     @POST("mutasi-cicilan.php")
-    Call<List<Mutasi>> mutasiTransaksi(
+    Call<Mutation> mutasiTransaksi(
             @Field("house_id") String houseId,
             @Field("start_date") String startDate,
             @Field("end_date") String endDate,
@@ -132,5 +133,9 @@ public interface ApiEndPoint {
     @FormUrlEncoded
     @POST("get-late-transaction.php")
     Call<List<Tagihan>> getTagihan(@Field("house_id") String houseId);
+
+    @FormUrlEncoded
+    @POST("delete-payment.php")
+    Call<Transaction> deletePayment(@Field("pay_id") String payId);
 
 }

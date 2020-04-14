@@ -9,8 +9,6 @@ import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,14 +19,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mycontact.BuyerActivity;
 import com.example.mycontact.R;
 import com.example.mycontact.adapter.MutationAdapter;
-import com.example.mycontact.model.Mutasi;
+import com.example.mycontact.model.Mutation;
+import com.example.mycontact.model.MutationData;
 import com.example.mycontact.network.ApiClient;
 import com.example.mycontact.network.ApiEndPoint;
 import com.google.android.material.chip.Chip;
-
 import java.util.Calendar;
 import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -37,13 +34,13 @@ public class FragMutation extends Fragment {
 
     private ApiEndPoint apiEndPoint;
     private MutationAdapter adapter;
-    private List<Mutasi> listMutasi;
+    private Mutation listMutationData;
 
     private RecyclerView recMutasi;
     private EditText edtFromDate;
     private EditText edtToDate;
     private Chip chipToday, chipWeek, chipMonth;
-    private TextView tvTitle, tvSubtitle;
+    private TextView tvTitle, tvSubtitle, tvTotalTrans;
 
     private String houseId;
 
@@ -69,8 +66,10 @@ public class FragMutation extends Fragment {
         recMutasi = view.findViewById(R.id.rec_mutation);
         tvTitle = view.findViewById(R.id.tv_title_mutation);
         tvSubtitle = view.findViewById(R.id.tv_subtitle_mutation);
+        tvTotalTrans = view.findViewById(R.id.tv_total_transaksi_mutation);
 
         tvSubtitle.setText("Silahkan Pilih Jangka Transaksi");
+        tvTotalTrans.setText("Silahkan Pilih Jangka Transaksi");
 
         edtFromDate.setOnClickListener(v -> pickDate(edtFromDate));
         edtToDate.setOnClickListener(v -> pickDate(edtToDate));
@@ -80,7 +79,7 @@ public class FragMutation extends Fragment {
     }
 
     void setRecItems() {
-        adapter = new MutationAdapter(listMutasi, getContext());
+        adapter = new MutationAdapter(listMutationData.getListMutation(), getContext());
         recMutasi.setLayoutManager(new LinearLayoutManager(getContext()));
         recMutasi.setAdapter(adapter);
     }
@@ -109,16 +108,18 @@ public class FragMutation extends Fragment {
     }
 
     void getMutasi(String from, String to, String range) {
-        Call<List<Mutasi>> callMutasi = apiEndPoint.mutasiTransaksi(houseId, from, to, range);
-        callMutasi.enqueue(new Callback<List<Mutasi>>() {
+        Call<Mutation> callMutasi = apiEndPoint.mutasiTransaksi(houseId, from, to, range);
+        callMutasi.enqueue(new Callback<Mutation>() {
             @Override
-            public void onResponse(Call<List<Mutasi>> call, Response<List<Mutasi>> response) {
-                listMutasi = response.body();
+            public void onResponse(Call<Mutation> call, Response<Mutation> response) {
+                listMutationData = response.body();
+
+                tvTotalTrans.setText(listMutationData.getTotalTrans());
                 setRecItems();
             }
 
             @Override
-            public void onFailure(Call<List<Mutasi>> call, Throwable t) {
+            public void onFailure(Call<Mutation> call, Throwable t) {
                 Log.d("gagalMutasi", t.getMessage());
             }
         });

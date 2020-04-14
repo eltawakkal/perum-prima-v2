@@ -8,19 +8,33 @@ public class Cicilan {
 
     @SerializedName("total_cicilan")
     private String totalCicilan;
+    @SerializedName("next_cicilan")
+    private String nextCicilan;
+    @SerializedName("status")
+    private String status;
     @SerializedName("data")
-    private List<ListCicilan> listCicilan;
+    private List<CicilanData> cicilanData;
 
-    public Cicilan(String totalCicilan, List<ListCicilan> listCicilan) {
+    public Cicilan(String totalCicilan, String nextCicilan, String status, List<CicilanData> cicilanData) {
         this.totalCicilan = totalCicilan;
-        this.listCicilan = listCicilan;
+        this.nextCicilan = nextCicilan;
+        this.status = status;
+        this.cicilanData = cicilanData;
     }
 
     public String getTotalCicilan() {
         return totalCicilan;
     }
 
-    public List<ListCicilan> getListCicilan() {
-        return listCicilan;
+    public String getNextCicilan() {
+        return nextCicilan;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public List<CicilanData> getCicilanData() {
+        return cicilanData;
     }
 }

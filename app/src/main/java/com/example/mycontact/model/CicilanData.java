@@ -1,21 +1,19 @@
 package com.example.mycontact.model;
 
-public class ListCicilan {
+public class CicilanData {
 
     private String id;
     private String cicilan;
     private String date;
-    private String status;
     private String type;
 
-    public ListCicilan() {
+    public CicilanData() {
     }
 
-    public ListCicilan(String id, String cicilan, String date, String status, String type) {
+    public CicilanData(String id, String cicilan, String date, String type) {
         this.id = id;
         this.cicilan = cicilan;
         this.date = date;
-        this.status = status;
         this.type = type;
     }
 
@@ -29,10 +27,6 @@ public class ListCicilan {
 
     public String getDate() {
         return date;
-    }
-
-    public String getStatus() {
-        return status;
     }
 
     public String getType() {

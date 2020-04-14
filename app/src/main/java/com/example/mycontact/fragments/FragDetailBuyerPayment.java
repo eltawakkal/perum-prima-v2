@@ -2,16 +2,19 @@ package com.example.mycontact.fragments;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,10 +30,10 @@ import com.example.mycontact.model.Cicilan;
 import com.example.mycontact.model.Transaction;
 import com.example.mycontact.network.ApiClient;
 import com.example.mycontact.network.ApiEndPoint;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.Calendar;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -40,11 +43,13 @@ public class FragDetailBuyerPayment extends Fragment {
 
     private ApiEndPoint apiEndPoint;
     private Buyer buyer;
-    private List<Cicilan> listBuyer;
+    private Cicilan listBuyer;
     private CicilanAdapter adapter;
 
     private RecyclerView recCicilan;
-    private TextView tvTotalCicilan;
+    private TextView tvTotalCicilan, tvTitleAddCicilan, tvMessageAddCicilan;
+    private RelativeLayout rlAddPayment;
+    private ImageView imgStatusTagihan;
     private FloatingActionButton fanAddCicilan;
 
     @Nullable
@@ -61,9 +66,13 @@ public class FragDetailBuyerPayment extends Fragment {
 
         recCicilan = v.findViewById(R.id.rec_cicilan);
         tvTotalCicilan = v.findViewById(R.id.tv_total_cicilan);
-        fanAddCicilan = v.findViewById(R.id.fab_add_cicilan);
+        tvTitleAddCicilan = v.findViewById(R.id.tv_title_add_cicilan);
+        tvMessageAddCicilan = v.findViewById(R.id.tv_message_add_cicilan);
+//        fanAddCicilan = v.findViewById(R.id.fab_add_cicilan);
+        rlAddPayment = v.findViewById(R.id.rl_add_payment);
+        imgStatusTagihan = v.findViewById(R.id.img_status_cicilan_cicilan);
 
-        fanAddCicilan.setOnClickListener( view-> {
+        rlAddPayment.setOnClickListener( view-> {
             addCicilanView();
         });
 
@@ -72,18 +81,33 @@ public class FragDetailBuyerPayment extends Fragment {
     }
 
     void getCicilanFromServer() {
-        Call<List<Cicilan>> callCicilan = apiEndPoint.getCicilan(buyer.getId(), buyer.getHouseId(), buyer.getUnit());
-        callCicilan.enqueue(new Callback<List<Cicilan>>() {
+        Call<Cicilan> callCicilan = apiEndPoint.getCicilan(buyer.getId(), buyer.getHouseId(), buyer.getUnit());
+        callCicilan.enqueue(new Callback<Cicilan>() {
             @Override
-            public void onResponse(Call<List<Cicilan>> call, Response<List<Cicilan>> response) {
+            public void onResponse(Call<Cicilan> call, Response<Cicilan> response) {
                 listBuyer = response.body();
 
                 setRecItems();
-                tvTotalCicilan.setText(listBuyer.get(0).getTotalCicilan());
+                tvTotalCicilan.setText(listBuyer.getTotalCicilan());
+
+                if (listBuyer.getCicilanData().size() != 0) {
+                    if (!listBuyer.getCicilanData().get(listBuyer.getCicilanData().size()-1).getType().equals("Selesai")) {
+                        tvTitleAddCicilan.setText("Selanjtutnya, Cicilan Ke " + (listBuyer.getCicilanData().size()));
+                        tvMessageAddCicilan.setText("Akan Jatuh Tempo Pada " + listBuyer.getNextCicilan());
+                    } else {
+                        tvTitleAddCicilan.setText("Lunas");
+                        tvMessageAddCicilan.setText("Semua cicilan telah diselesaikan");
+                    }
+                    if (listBuyer.getStatus().equals("telat")) {
+                        imgStatusTagihan.setImageResource(R.drawable.ic_warning);
+                    } else {
+                        imgStatusTagihan.setImageResource(R.drawable.ic_info);
+                    }
+                }
             }
 
             @Override
-            public void onFailure(Call<List<Cicilan>> call, Throwable t) {
+            public void onFailure(Call<Cicilan> call, Throwable t) {
 
             }
         });
@@ -100,36 +124,51 @@ public class FragDetailBuyerPayment extends Fragment {
 
         EditText edtCicilan = view.findViewById(R.id.edt_cicilan_cicilan);
         EditText edtTransDate = view.findViewById(R.id.edt_trans_date_cicilan);
+        CheckBox chkSelesaiCicilan = view.findViewById(R.id.chk_selesai_cicilan);
+        MaterialButton btnAddPayment = view.findViewById(R.id.btn_add_payment_to_server);
 
         edtTransDate.setOnClickListener(v -> pickDate(edtTransDate));
 
         AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-        alert
-                .setCancelable(false)
-                .setTitle("Tambah Transaksi Baru")
-                .setNegativeButton("Batal", null)
-                .setPositiveButton("Tambah", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        String cicilan = edtCicilan.getText().toString();
-                        String transDate = edtTransDate.getText().toString();
-                        addDataToServer(cicilan, transDate);
-
-                    }
-                });
+//        alert
+//                .setCancelable(false)
+//                .setTitle("Tambah Transaksi Baru")
+//                .setNegativeButton("Batal", null)
+//                .setPositiveButton("Tambah", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//
+//
+//
+//                    }
+//                });
         alert.setView(view);
-        alert.show();
+        Dialog dialog = alert.create();
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.show();
+
+        btnAddPayment.setOnClickListener(v -> {
+            String cicilan = edtCicilan.getText().toString();
+            String transDate = edtTransDate.getText().toString();
+            boolean selesai = chkSelesaiCicilan.isChecked();
+            addDataToServer(cicilan, transDate, selesai);
+            dialog.dismiss();
+        });
     }
 
-    void addDataToServer(String cicilan, String transDate) {
+    void addDataToServer(String cicilan, String transDate, boolean lunas) {
         String type = "";
 
-        if (listBuyer.get(0).getListCicilan().size() == 0) {
+        if (listBuyer.getCicilanData().size() == 0) {
             type = "Booking Fee";
         } else {
-            type = "Cicilan Ke " + (listBuyer.get(0).getListCicilan().size());
+            if (lunas) {
+                type = "Selesai";
+            } else {
+                type = "Cicilan Ke " + (listBuyer.getCicilanData().size());
+            }
         }
+
         Call<Transaction> callCicilan = apiEndPoint.addCicilan(buyer.getId(), buyer.getHouseId(), buyer.getUnit(), cicilan, transDate, type);
         callCicilan.enqueue(new Callback<Transaction>() {
             @Override
