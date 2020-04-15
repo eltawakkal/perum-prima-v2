@@ -1,41 +1,31 @@
 package com.example.mycontact.adapter;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.mycontact.R;
 import com.example.mycontact.model.Cicilan;
 import com.example.mycontact.model.CicilanData;
-import com.example.mycontact.model.Transaction;
-import com.example.mycontact.network.ApiClient;
-import com.example.mycontact.network.ApiEndPoint;
-
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class CicilanAdapter extends RecyclerView.Adapter<CicilanAdapter.ViewHolder> {
 
-    private ApiEndPoint apiEndPoint;
+    public interface RecyclerOnItemClickHandler {
+        void onItemClicked(int position);
+    }
 
     private Cicilan listCicilan;
     private Context context;
+    private RecyclerOnItemClickHandler recyclerOnItemClickHandler;
 
-    public CicilanAdapter(Cicilan listCicilan, Context context) {
+    public CicilanAdapter(Cicilan listCicilan, Context context, RecyclerOnItemClickHandler recyclerOnItemClickHandler) {
         this.listCicilan = listCicilan;
         this.context = context;
-        apiEndPoint = ApiClient.getRetrofit().create(ApiEndPoint.class);
+        this.recyclerOnItemClickHandler = recyclerOnItemClickHandler;
     }
 
     @NonNull
@@ -76,41 +66,8 @@ public class CicilanAdapter extends RecyclerView.Adapter<CicilanAdapter.ViewHold
             tvTitle.setText(cicilan.getType());
             tvCicilan.setText(cicilan.getCicilan());
             tvTransDate.setText(cicilan.getDate());
-
-            imgDeletePay.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    AlertDialog.Builder alert = new AlertDialog.Builder(context);
-                    alert
-                            .setTitle("Hapus Transaksi")
-                            .setMessage("Yakin Hapus Transaksi" + cicilan.getType())
-                            .setNegativeButton("Batal", null)
-                            .setPositiveButton("Hapus", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    deletePayment(position);
-                                }
-                            })
-                    .show();
-                }
-            });
-
+            imgDeletePay.setOnClickListener(v -> recyclerOnItemClickHandler.onItemClicked(position));
         }
 
-        void deletePayment(int position) {
-            Call<Transaction> deletePay = apiEndPoint.deletePayment(listCicilan.getCicilanData().get(position).getId());
-            deletePay.enqueue(new Callback<Transaction>() {
-                @Override
-                public void onResponse(Call<Transaction> call, Response<Transaction> response) {
-                    listCicilan.getCicilanData().remove(position);
-                    notifyDataSetChanged();
-                }
-
-                @Override
-                public void onFailure(Call<Transaction> call, Throwable t) {
-
-                }
-            });
-        }
     }
 }

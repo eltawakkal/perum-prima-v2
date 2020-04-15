@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -39,7 +40,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class FragDetailBuyerPayment extends Fragment {
+public class FragDetailBuyerPayment extends Fragment implements CicilanAdapter.RecyclerOnItemClickHandler {
 
     private ApiEndPoint apiEndPoint;
     private Buyer buyer;
@@ -85,6 +86,7 @@ public class FragDetailBuyerPayment extends Fragment {
         callCicilan.enqueue(new Callback<Cicilan>() {
             @Override
             public void onResponse(Call<Cicilan> call, Response<Cicilan> response) {
+                listBuyer = null;
                 listBuyer = response.body();
 
                 setRecItems();
@@ -103,6 +105,9 @@ public class FragDetailBuyerPayment extends Fragment {
                     } else {
                         imgStatusTagihan.setImageResource(R.drawable.ic_info);
                     }
+                } else {
+                    tvTitleAddCicilan.setText("Silahkan Klik Untuk Menambahkan");
+                     tvMessageAddCicilan.setText("Silahkan Klik Untuk Menambahkan");
                 }
             }
 
@@ -114,7 +119,7 @@ public class FragDetailBuyerPayment extends Fragment {
     }
 
     void setRecItems() {
-        adapter = new CicilanAdapter(listBuyer, getContext());
+        adapter = new CicilanAdapter(listBuyer, getContext(), this);
         recCicilan.setLayoutManager(new LinearLayoutManager(getContext()));
         recCicilan.setAdapter(adapter);
     }
@@ -142,6 +147,7 @@ public class FragDetailBuyerPayment extends Fragment {
 //
 //                    }
 //                });
+
         alert.setView(view);
         Dialog dialog = alert.create();
         dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
@@ -151,8 +157,25 @@ public class FragDetailBuyerPayment extends Fragment {
             String cicilan = edtCicilan.getText().toString();
             String transDate = edtTransDate.getText().toString();
             boolean selesai = chkSelesaiCicilan.isChecked();
+
             addDataToServer(cicilan, transDate, selesai);
+
             dialog.dismiss();
+        });
+    }
+
+    void deletePayment(int position) {
+        Call<Transaction> deletePay = apiEndPoint.deletePayment(listBuyer.getCicilanData().get(position).getId());
+        deletePay.enqueue(new Callback<Transaction>() {
+            @Override
+            public void onResponse(Call<Transaction> call, Response<Transaction> response) {
+                getCicilanFromServer();
+            }
+
+            @Override
+            public void onFailure(Call<Transaction> call, Throwable t) {
+
+            }
         });
     }
 
@@ -181,6 +204,7 @@ public class FragDetailBuyerPayment extends Fragment {
                 Log.d("gagalAddCicilan", t.getMessage());
             }
         });
+
     }
 
     void pickDate(EditText edt) {
@@ -196,4 +220,25 @@ public class FragDetailBuyerPayment extends Fragment {
         }, year, month, day);
         datePickerDialog.show();
     }
+
+    @Override
+    public void onItemClicked(int position) {
+        deleteDataView(position);
+    }
+
+    void deleteDataView(int position) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                    alert
+                            .setTitle("Hapus Transaksi")
+                            .setMessage("Yakin Hapus Transaksi" + listBuyer.getCicilanData().get(position).getType())
+                            .setNegativeButton("Batal", null)
+                            .setPositiveButton("Hapus", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    deletePayment(position);
+                                }
+                            })
+                    .show();
+    }
+
 }
